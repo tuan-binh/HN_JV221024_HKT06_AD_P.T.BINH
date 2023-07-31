@@ -113,47 +113,49 @@ end;
 insert into sinhvien values (11,"Phạm Tuấn Bình","CT11",1,"2001-09-18","Hà Nội");
 
 -- 17.	Viết một function DOC_DIEM đọc điểm chữ số thập phân thành chữ  Sau đó ứng dụng để lấy ra MaSV, HoTen, MaHP, DiemHP, DOC_DIEM(DiemHP) để đọc điểm HP của sinh viên đó thành chữ
+set delimiter //
+create function DOC_DIEM(diem float) returns varchar(255) deterministic
+begin 
+	declare doc_diem varchar(255);
+    declare phan_nguyen int;
+    declare phan_thap_phan float;
+    
+    set doc_diem = '';
+    set phan_nguyen = floor(diem);
+    set phan_thap_phan = round((diem - phan_nguyen) * 10);
+    
+    if(phan_nguyen >= 0 and phan_nguyen <= 10) then
+		set doc_diem = case
+			when phan_nguyen = 0 then  concat(doc_diem,'Không')
+			when phan_nguyen = 1 then  concat(doc_diem,'Một')
+			when phan_nguyen = 2 then  concat(doc_diem,'Hai')
+			when phan_nguyen = 3 then  concat(doc_diem,'Ba')
+			when phan_nguyen = 4 then  concat(doc_diem,'Bốn')
+			when phan_nguyen = 5 then  concat(doc_diem,'Năm')
+			when phan_nguyen = 6 then  concat(doc_diem,'Sáu')
+			when phan_nguyen = 7 then  concat(doc_diem,'Bảy')
+			when phan_nguyen = 8 then  concat(doc_diem,'Tám')
+			when phan_nguyen = 9 then  concat(doc_diem,'Chín')
+			when phan_nguyen = 10 then concat(doc_diem,'Mười')
+		end;
+		set doc_diem = case
+			when phan_thap_phan = 0 then concat(doc_diem,'')
+			when phan_thap_phan = 1 then concat(doc_diem,' Phẩy Một')
+			when phan_thap_phan = 2 then concat(doc_diem,' Phẩy Hai')
+			when phan_thap_phan = 3 then concat(doc_diem,' Phẩy Ba')
+			when phan_thap_phan = 4 then concat(doc_diem,' Phẩy Bốn')
+			when phan_thap_phan = 5 then concat(doc_diem,' Phẩy Năm')
+			when phan_thap_phan = 6 then concat(doc_diem,' Phẩy Sáu')
+			when phan_thap_phan = 7 then concat(doc_diem,' Phẩy Bảy')
+			when phan_thap_phan = 8 then concat(doc_diem,' Phẩy Tám')
+			when phan_thap_phan = 9 then concat(doc_diem,' Phẩy Chín')
+		end;
+    end if;
+    return doc_diem;
+end //
 
--- create function DOC_DIEM(diem float) returns varchar(255); 
--- begin 
--- 	declare doc_diem varchar(255);
---     declare phan_nguyen int;
---     declare phan_thap_phan float;
---     
---     set doc_diem = '';
---     set phan_nguyen = FLOOR(diem);
---     set phan_thap_phan = diem - phan_nguyen;
---     
---     if diem = 0 then return 'không';
---     if diem = 10 then return 'mười';
---     
---     case
--- 		when phan_nguyen = 0 then set doc_diem = concat(doc_diem,'Không');
--- 		when phan_nguyen = 1 then set doc_diem = concat(doc_diem,'Một');
--- 		when phan_nguyen = 2 then set doc_diem = concat(doc_diem,'Hai');
--- 		when phan_nguyen = 3 then set doc_diem = concat(doc_diem,'Ba');
--- 		when phan_nguyen = 4 then set doc_diem = concat(doc_diem,'Bốn');
--- 		when phan_nguyen = 5 then set doc_diem = concat(doc_diem,'Năm');
--- 		when phan_nguyen = 6 then set doc_diem = concat(doc_diem,'Sáu');
--- 		when phan_nguyen = 7 then set doc_diem = concat(doc_diem,'Bảy');
--- 		when phan_nguyen = 8 then set doc_diem = concat(doc_diem,'Tám');
--- 		when phan_nguyen = 9 then set doc_diem = concat(doc_diem,'Chín');
---     end;
---     set doc_diem = concat(doc_diem,' phẩy ');
---     case
--- 		when phan_thap_phan = 0.0 then set doc_diem = concat(doc_diem,'');
--- 		when phan_thap_phan = 0.1 then set doc_diem = concat(doc_diem,'Một');
--- 		when phan_thap_phan = 0.2 then set doc_diem = concat(doc_diem,'Hai');
--- 		when phan_thap_phan = 0.3 then set doc_diem = concat(doc_diem,'Ba');
--- 		when phan_thap_phan = 0.4 then set doc_diem = concat(doc_diem,'Bốn');
--- 		when phan_thap_phan = 0.5 then set doc_diem = concat(doc_diem,'Năm');
--- 		when phan_thap_phan = 0.6 then set doc_diem = concat(doc_diem,'Sáu');
--- 		when phan_thap_phan = 0.7 then set doc_diem = concat(doc_diem,'Bảy');
--- 		when phan_thap_phan = 0.8 then set doc_diem = concat(doc_diem,'Tám');
--- 		when phan_thap_phan = 0.9 then set doc_diem = concat(doc_diem,'Chín');
---     end;
---     return doc_diem;
--- end //
+select sv.MaSV,sv.HoTen,d.MaHP,d.DiemHP,DOC_DIEM(d.DiemHP) from sinhvien sv
+join diemhp d on sv.MaSV = d.MaSV;
 
 -- 18.	Tạo thủ tục: HIEN_THI_DIEM Hiển thị danh sách gồm MaSV, HoTen, MaLop, DiemHP, MaHP của những sinh viên có DiemHP nhỏ hơn số chỉ định, nếu không có thì hiển thị thông báo không có sinh viên nào.
 -- VD: Call HIEN_THI_DIEM(5);
